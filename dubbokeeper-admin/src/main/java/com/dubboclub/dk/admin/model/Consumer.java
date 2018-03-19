@@ -214,6 +214,7 @@ public class Consumer extends BasicModel {
 		this.providers = providers;
 	}
 
+    @java.lang.Override
     public String toString() {
         return "Consumer [serviceKey=" + serviceKey + ", parameters=" + parameters + ", result=" + result
                 + ", address=" + address + ", registry=" + registry + ", application="

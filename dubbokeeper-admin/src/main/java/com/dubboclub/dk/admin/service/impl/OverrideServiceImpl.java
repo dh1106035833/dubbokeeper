@@ -24,6 +24,19 @@ import java.util.concurrent.ConcurrentMap;
 public class OverrideServiceImpl extends AbstractService implements OverrideService {
 
 
+    /**
+     * 通过provider获取相关联的Overrides，关联规则：
+     * 1、ip相同，或者Override ip为 *
+     * 2、应用名（application）相同，或者Override 应用名为 *
+     * 3、端口相同，或者Override 端口为0
+     * 4、接口（interface）相同
+     * 5、组相同，或者同时为空
+     * 6、版本号相同，或者同时为空
+     *
+     * @param provider provider
+     * @return Overrides
+     */
+    @java.lang.Override
     public List<com.dubboclub.dk.admin.model.Override> listByProvider(Provider provider) {
         List<Override> overrides = new ArrayList<Override>();
         ConcurrentMap<String, Map<Long, URL>> serviceUrls = getServiceByCategory(Constants.CONFIGURATORS_CATEGORY);
@@ -53,6 +66,7 @@ public class OverrideServiceImpl extends AbstractService implements OverrideServ
         return overrides;
     }
 
+    @java.lang.Override
     public List<Override> listByServiceKey(String serviceKey) {
         List<Override> overrides = new ArrayList<Override>();
         ConcurrentMap<String, Map<Long, URL>> serviceUrls = getServiceByCategory(Constants.CONFIGURATORS_CATEGORY);
@@ -76,6 +90,7 @@ public class OverrideServiceImpl extends AbstractService implements OverrideServ
     }
 
 
+    @java.lang.Override
     public void update(Override override) {
         delete(override.getId());
         add(override);

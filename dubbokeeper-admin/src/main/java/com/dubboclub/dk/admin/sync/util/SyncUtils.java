@@ -41,9 +41,17 @@ public class SyncUtils {
 
     private static final ConfiguratorFactory configuratorFactory = ExtensionLoader.getExtensionLoader(ConfiguratorFactory.class).getAdaptiveExtension();
 
+    /**
+     * 生成Service唯一标识：Group + interfaceName + version
+     *
+     * @param url URL
+     * @return Service唯一标识
+     */
     public static String generateServiceKey(URL url){
         String inf = url.getServiceInterface();
-        if (inf == null) return null;
+        if (inf == null) {
+            return null;
+        }
         StringBuilder buf = new StringBuilder();
         String group = url.getParameter(Constants.GROUP_KEY);
         if (group != null&& group.length() > 0) {
@@ -88,8 +96,9 @@ public class SyncUtils {
         Long id = pair.getKey();
         URL url = pair.getValue();
 
-        if (url == null)
+        if (url == null) {
             return null;
+        }
 
         Provider p = new Provider();
         p.setId(id);
@@ -128,8 +137,9 @@ public class SyncUtils {
         Long id = pair.getKey();
         URL url = pair.getValue();
 
-        if (null == url)
+        if (null == url) {
             return null;
+        }
 
         Consumer c = new Consumer();
         c.setId(id);
@@ -145,13 +155,20 @@ public class SyncUtils {
     
     public static List<Consumer> url2ConsumerList(Map<Long, URL> cs) {
         List<Consumer> list = new ArrayList<Consumer>();
-        if(cs == null) return list;
+        if (cs == null) {
+            return list;
+        }
         for(Map.Entry<Long, URL> entry : cs.entrySet()) {
             list.add(url2Consumer(new Pair<Long, URL>(entry.getKey(), entry.getValue())));
         }
         return list;
     }
 
+    /**
+     * 把URL对象转换成Route对象
+     * @param pair URL Pair
+     * @return Route对象
+     */
     public static Route url2Route(Pair<Long, URL> pair) {
     	if (pair == null) {
     		return null;
@@ -160,13 +177,15 @@ public class SyncUtils {
         Long id = pair.getKey();
         URL url = pair.getValue();
 
-        if (null == url)
+        if (null == url) {
             return null;
+        }
 
         Route r = new Route();
         r.setId(id);
         r.setName(url.getParameter("name"));
         r.setService(generateServiceKey(url));
+        r.setApplication(url.getParameter(Constants.APPLICATION_KEY));
         r.setPriority(url.getParameter(Constants.PRIORITY_KEY, 0));
         r.setEnabled(url.getParameter(Constants.ENABLED_KEY, true));
         r.setForce(url.getParameter(Constants.FORCE_KEY, false));
@@ -178,7 +197,9 @@ public class SyncUtils {
     
     public static List<Route> url2RouteList(Map<Long, URL> cs) {
         List<Route> list = new ArrayList<Route>();
-        if(cs == null) return list;
+        if (cs == null) {
+            return list;
+        }
         for(Map.Entry<Long, URL> entry : cs.entrySet()) {
             list.add(url2Route(new Pair<Long, URL>(entry.getKey(), entry.getValue())));
         }
@@ -193,8 +214,9 @@ public class SyncUtils {
         Long id = pair.getKey();
         URL url = pair.getValue();
 
-        if (null == url)
+        if (null == url) {
             return null;
+        }
 
         Override o = new Override();
         o.setId(id);

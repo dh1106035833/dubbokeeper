@@ -5,23 +5,31 @@ import com.dubboclub.dk.admin.model.Route;
 import java.util.List;
 
 /**
- * Created by bieber on 2015/6/3.
+ *
+ * @author bieber
+ * @date 2015/6/3
  */
 public interface RouteService {
 
-    public void createRoute(Route route);
+    /**
+     * 列出所有的路由信息
+     * @return 所有的路由信息
+     */
+    List<Route> listAllRoutes();
 
-    public void deleteRoute(Long id);
+    void createRoute(Route route);
 
-    public void updateRoute(Route route);
+    void deleteRoute(Long id);
 
-    public List<Route> listByServiceKey(String serviceKey);
+    void updateRoute(Route route);
 
-    public Route getRoute(Long id);
+    List<Route> listByServiceKey(String serviceKey);
 
-    public void enable(Long id);
+    Route getRoute(Long id);
 
-    public void disable(Long id);
+    void enable(Long id);
+
+    void disable(Long id);
 
 
 }

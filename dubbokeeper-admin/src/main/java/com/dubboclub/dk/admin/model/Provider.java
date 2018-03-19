@@ -41,7 +41,7 @@ public class Provider extends BasicModel {
 
     private String address; /* 提供者地址 */
 
-    private String registry;/* 提供者连接的注册中心地址 */
+    private String registry; /* 提供者连接的注册中心地址 */
 
     private boolean dynamic;          /* 是否为动态注册服务 */
 

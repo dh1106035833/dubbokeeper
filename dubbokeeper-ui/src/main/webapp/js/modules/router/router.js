@@ -282,8 +282,7 @@ router.controller('conditionEdit',function($scope,$httpWrapper,$routeParams,$que
         }else if(matchRule.length>0){
             matchRule=matchRule.substring(0,matchRule.length-1);
         }
-        
-        
+
         var filterRule="";
         if($scope.thenList.length>0){
             for(var i=0;i<$scope.thenList.length;i++){

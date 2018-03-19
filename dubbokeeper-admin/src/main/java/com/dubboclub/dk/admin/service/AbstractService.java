@@ -22,7 +22,6 @@ public abstract class AbstractService {
         registryServerSync.update(oldURL,newURL);
     }
 
-
     protected void delete(URL url){
         registryServerSync.unregister(url);
     }
@@ -57,7 +56,20 @@ public abstract class AbstractService {
     protected <T extends BasicModel> List<T> filterCategoryDataByServiceKey(ConvertURL2Entity<T> convertURLTOEntity,String category,String serviceKey){
         return filterCategoryData(convertURLTOEntity,category,Constants.INTERFACE_KEY, Tool.getInterface(serviceKey),Constants.GROUP_KEY,Tool.getGroup(serviceKey),Constants.VERSION_KEY,Tool.getVersion(serviceKey));
     }
-    //通过对某个目录下的数据定义过滤器，过滤出复核条件的数据
+
+    /**
+     * 通过对某个目录下的数据定义过滤器，过滤出符合条件的数据
+     *
+     * @param convertURLTOEntity URL转换成输出的工具类
+     * @param category           类型:
+     *                           ("providers":"服务提供者"，
+     *                            "consumers":"服务消费者"，
+     *                            "routers":"路由配置"，
+     *                            "overrides":"动态配置，禁用启用等，每个IP的provider都可以有一条动态配置")
+     * @param params             传入参数
+     * @param <T>                输出类型
+     * @return                   输出类型
+     */
     protected<T extends BasicModel> List<T>  filterCategoryData(ConvertURL2Entity<T> convertURLTOEntity,String category,String... params){
         if(params.length%2!=0){
             throw  new IllegalArgumentException("filter params size must be paired");
@@ -78,6 +90,16 @@ public abstract class AbstractService {
         return entities;
     }
 
+    /**
+     *
+     * @param filter   过滤器，从registryCache中过滤出查询信息
+     * @param category 类型:
+     *                 ("providers":"服务提供者"，
+     *                  "consumers":"服务消费者"，
+     *                  "routers":"路由配置"，
+     *                  "overrides":"动态配置，禁用启用等，每个IP的provider都可以有一条动态配置" )
+     * @return 匹配数据
+     */
     protected Collection<Map.Entry<Long,URL>> filterCategoryData(Map<String,String> filter,String category){
         ConcurrentMap<String, Map<Long, URL>> services = getServiceByCategory(category);
         List<Map.Entry<Long,URL>> matchedData = new ArrayList<Map.Entry<Long,URL>>();

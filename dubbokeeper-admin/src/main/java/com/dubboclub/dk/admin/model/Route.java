@@ -17,6 +17,8 @@ package com.dubboclub.dk.admin.model;
 
 import com.alibaba.dubbo.common.Constants;
 import com.alibaba.dubbo.common.URL;
+
+import java.lang.Override;
 import java.util.List;
 import org.springframework.util.StringUtils;
 
@@ -64,6 +66,8 @@ public class Route  extends BasicModel{
     private String name;
     
     private String service;
+
+    private String application;
     
     private String rule;
     
@@ -87,7 +91,6 @@ public class Route  extends BasicModel{
     
     public Route() {
     }
-
 
     public String getScriptType() {
         return scriptType;
@@ -184,7 +187,7 @@ public class Route  extends BasicModel{
             if(rules.length==2){
                 this.matchRule = rules[0];
                 this.filterRule = rules[1];
-            }else{
+            }else if (rules.length > 0){
                 this.matchRule = rules[0];
             }
         }
@@ -207,7 +210,16 @@ public class Route  extends BasicModel{
 		this.filterRule = filterRule;
 	}
 
-	public String toString() {
+    public String getApplication() {
+        return application;
+    }
+
+    public void setApplication(String application) {
+        this.application = application;
+    }
+
+	@Override
+    public String toString() {
 		return "Route [parentId=" + parentId + ", name=" + name
 				+ ", serviceName=" + service + ", matchRule=" + matchRule
 				+ ", filterRule=" + filterRule + ", priority=" + priority
@@ -230,7 +242,7 @@ public class Route  extends BasicModel{
         }
 	    return URL.valueOf(Constants.ROUTE_PROTOCOL + "://" + Constants.ANYHOST_VALUE + "/" + path 
 	            + "?" + Constants.CATEGORY_KEY + "=" + Constants.ROUTERS_CATEGORY 
-	            + "&router=condition&runtime=false&enabled=" + isEnabled() + "&priority=" + getPriority() + "&force=" + isForce() + "&dynamic=false"
+	            + "&router=condition&runtime=true&enabled=" + isEnabled() + "&priority=" + getPriority() + "&force=" + isForce() + "&dynamic=false"
 	            + "&name=" + getName() + "&" + Constants.RULE_KEY + "=" + URL.encode(StringUtils.isEmpty(rule)?(getMatchRule() + " => " + getFilterRule()):rule)
 	            + (group == null ? "" : "&" + Constants.GROUP_KEY + "=" + group)
 	            + (version == null ? "" : "&" + Constants.VERSION_KEY + "=" + version)+"&"+Constants.ROUTER_KEY+"="+type+(getScriptType()==null?"":"&"+Constants.TYPE_KEY+"="+getScriptType()));

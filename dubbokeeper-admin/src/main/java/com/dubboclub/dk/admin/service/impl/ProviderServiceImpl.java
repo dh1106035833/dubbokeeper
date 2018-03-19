@@ -15,7 +15,9 @@ import com.dubboclub.dk.admin.sync.util.Tool;
 import java.util.*;
 
 /**
- * Created by bieber on 2015/6/3.
+ *
+ * @author bieber
+ * @date 2015/6/3
  */
 public class ProviderServiceImpl extends AbstractService implements ProviderService {
 
@@ -25,23 +27,28 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
     @java.lang.Override
     public List<Provider> listAllProvider() {
         return filterCategoryData(new ConvertURL2Entity<Provider>() {
+            @java.lang.Override
             public Provider convert(Pair<Long, URL> pair) {
                 return SyncUtils.url2Provider(pair);
             }
         },Constants.PROVIDERS_CATEGORY);
     }
 
+    @java.lang.Override
     public List<Provider> listProviderByApplication(String appName) {
         return filterCategoryData(new ConvertURL2Entity<Provider>() {
+            @java.lang.Override
             public Provider convert(Pair<Long, URL> pair) {
                 return SyncUtils.url2Provider(pair);
             }
         },Constants.PROVIDERS_CATEGORY,Constants.APPLICATION_KEY,appName);
     }
 
+    @java.lang.Override
     public List<Provider> listProviderByService(String service) {
         return filterCategoryData(new ConvertURL2Entity<Provider>() {
             List<String> hadContained = new ArrayList<String>();
+            @java.lang.Override
             public Provider convert(Pair<Long, URL> pair) {
                 if(hadContained.contains(pair.getValue().getHost()+":"+pair.getValue().getPort())){
                     return null;
@@ -52,8 +59,10 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
         },Constants.PROVIDERS_CATEGORY,Constants.INTERFACE_KEY,service);
     }
 
+    @java.lang.Override
     public List<Provider> listProviderByConditions(String... conditions) {
         return filterCategoryData(new ConvertURL2Entity<Provider>() {
+            @java.lang.Override
             public Provider convert(Pair<Long, URL> pair) {
                 Provider provider = SyncUtils.url2Provider(pair);
                 if(provider.isDynamic()){
@@ -69,6 +78,7 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
         return listProviderByConditions(Constants.INTERFACE_KEY, Tool.getInterface(serviceKey),Constants.GROUP_KEY,Tool.getGroup(serviceKey),Constants.VERSION_KEY,Tool.getVersion(serviceKey));
     }
 
+    @java.lang.Override
     public Provider getProviderById(long id) {
         URL url = getOneById(Constants.PROVIDERS_CATEGORY,id);
         if(url!=null){
@@ -83,6 +93,7 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
         return null;
     }
 
+    @java.lang.Override
     public void updateProvider(Provider newProvider) {
         Provider oldProvider = getProviderById(newProvider.getId());
         if(newProvider.isDynamic()){
@@ -116,7 +127,8 @@ public class ProviderServiceImpl extends AbstractService implements ProviderServ
         Map<String,String> params = Tool.convertParametersMap(provider.getParameters());
         Override override = new Override();
         override.setAddress(provider.getAddress());
-        override.setService(Tool.getInterface(provider.getServiceKey()));
+        //之前是: override.setService(Tool.getInterface(provider.getServiceKey()));
+        override.setService(provider.getServiceKey());
         override.setEnabled(true);
         if(!StringUtils.isEmpty(params.get(Constants.WEIGHT_KEY))){
             override.setParams(Constants.WEIGHT_KEY+"="+params.get(Constants.WEIGHT_KEY));

@@ -30,8 +30,6 @@ public class OverrideController {
     @Autowired
     private ProviderService providerService;
 
-
-
     @RequestMapping("/provider/{serviceKey}/list.htm")
     public @ResponseBody List<OverrideInfo>  listOverridesByProvider(@PathVariable("serviceKey")String serviceKey) throws UnsupportedEncodingException {
         List<Override> overrideList =  overrideService.listByServiceKey(URLDecoder.decode(serviceKey,"UTF-8"));
@@ -41,7 +39,6 @@ public class OverrideController {
         }
         return overrideInfos;
     }
-
 
     @RequestMapping("/provider/{serviceKey}/weight-list.htm")
     public @ResponseBody List<WeightOverrideInfo>  listWeightOverridesByProvider(@PathVariable("serviceKey")String serviceKey) throws UnsupportedEncodingException {

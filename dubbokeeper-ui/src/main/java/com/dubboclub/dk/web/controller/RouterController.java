@@ -1,6 +1,8 @@
 package com.dubboclub.dk.web.controller;
 
 import com.alibaba.dubbo.common.Constants;
+import com.alibaba.dubbo.common.logger.Logger;
+import com.alibaba.dubbo.common.logger.LoggerFactory;
 import com.dubboclub.dk.admin.model.Provider;
 import com.dubboclub.dk.admin.model.Route;
 import com.dubboclub.dk.admin.service.ProviderService;
@@ -14,14 +16,20 @@ import org.springframework.web.bind.annotation.*;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Created by bieber on 2015/7/25.
+ *
+ * @author bieber
+ * @date 2015/7/25
  */
 @Controller
 @RequestMapping("/route")
 public class RouterController {
+
+    private static Logger logger = LoggerFactory.getLogger(RouterController.class);
 
     @Autowired
     private RouteService routeService;
@@ -29,6 +37,7 @@ public class RouterController {
     @Autowired
     private ProviderService providerService;
 
+    //点击查看路由规则明细接口
     @RequestMapping("provider/{serviceKey}/list.htm")
     public @ResponseBody List<Route> queryRoutesByServiceKey(@PathVariable("serviceKey")String serviceKey) throws UnsupportedEncodingException {
         serviceKey = URLDecoder.decode(serviceKey, "UTF-8");
@@ -91,28 +100,57 @@ public class RouterController {
         return response;
     }
 
+//    @ResponseBody
+//    @RequestMapping("list.htm")
+//    public List<RouteAbstractInfo> list(){
+//        //这么写效率低下，并不是所有的provider都有route信息，应该先查route，再查在provider中是否存在
+//        List<Provider> providers = providerService.listAllProvider();
+//        List<RouteAbstractInfo> routeAbstractInfos = new ArrayList<RouteAbstractInfo>();
+//        for(Provider provider :providers){
+//            try {
+//                int count = routeService.listByServiceKey(provider.getServiceKey()).size();
+//                if(count > 0){
+//                    RouteAbstractInfo routeAbstractInfo = new RouteAbstractInfo();
+//                    routeAbstractInfo.setServiceKey(provider.getServiceKey());
+//                    routeAbstractInfo.setApplicationName(provider.getApplication());
+//                    routeAbstractInfo.setRouteCount(count);
+//                    routeAbstractInfos.add(routeAbstractInfo);
+//                }
+//            } catch (Exception e) {
+//                logger.error(e);
+//            }
+//        }
+//        return routeAbstractInfos;
+//    }
 
     @ResponseBody
     @RequestMapping("list.htm")
     public List<RouteAbstractInfo> list(){
-        List<Provider> providers = providerService.listAllProvider();
-        List<RouteAbstractInfo> routeAbstractInfos = new ArrayList<RouteAbstractInfo>();
-        for(Provider provider :providers){
-            RouteAbstractInfo routeAbstractInfo = new RouteAbstractInfo();
-            routeAbstractInfo.setServiceKey(provider.getServiceKey());
-            routeAbstractInfo.setApplicationName(provider.getApplication());
-            routeAbstractInfo.setRouteCount(routeService.listByServiceKey(provider.getServiceKey()).size());
-            if(routeAbstractInfo.getRouteCount()>0){
-                routeAbstractInfos.add(routeAbstractInfo);
+        List<Route> routes = routeService.listAllRoutes();
+        Map<String, RouteAbstractInfo> routeAbstractInfoMap = new HashMap<String, RouteAbstractInfo>();
+        for (Route route : routes) {
+            String routeAbstractInfoKey = route.getApplication() + route.getService();
+            RouteAbstractInfo routeAbstractInfo = routeAbstractInfoMap.get(routeAbstractInfoKey);
+            if (routeAbstractInfo == null) {
+                List<Provider> providers = providerService.listProviderByServiceKey(route.getService());
+                if (providers != null && providers.size() > 0) {
+                    routeAbstractInfo = new RouteAbstractInfo();
+                    routeAbstractInfo.setServiceKey(route.getService());
+                    routeAbstractInfo.setApplicationName(providers.get(0).getApplication());
+                    routeAbstractInfo.setRouteCount(1);
+                    routeAbstractInfoMap.put(routeAbstractInfoKey, routeAbstractInfo);
+                }
+            } else {
+                routeAbstractInfo.setRouteCount(routeAbstractInfo.getRouteCount() + 1);
             }
         }
-        return routeAbstractInfos;
+        return new ArrayList<RouteAbstractInfo>(routeAbstractInfoMap.values());
     }
 
+    //根据ID查询Route
     @RequestMapping("get_{id}.htm")
     public @ResponseBody Route getRoute(@PathVariable("id")Long id){
         return routeService.getRoute(id);
     }
-
 
 }

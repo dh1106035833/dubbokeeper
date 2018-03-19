@@ -12,9 +12,21 @@ import com.dubboclub.dk.admin.sync.util.Tool;
 import java.util.List;
 
 /**
- * Created by bieber on 2015/7/25.
+ *
+ * @author bieber
+ * @date 2015/7/25
  */
 public class RouteServiceImpl extends AbstractService implements RouteService {
+
+    @Override
+    public List<Route> listAllRoutes() {
+        return filterCategoryData(new ConvertURL2Entity<Route>() {
+            @java.lang.Override
+            public Route convert(Pair<Long, URL> pair) {
+                return SyncUtils.url2Route(pair);
+            }
+        },Constants.ROUTERS_CATEGORY);
+    }
 
     @Override
     public void createRoute(Route route) {
@@ -32,6 +44,11 @@ public class RouteServiceImpl extends AbstractService implements RouteService {
         update(oldUrl,route.toUrl());
     }
 
+    /**
+     * 根据serviceKey查询出匹配的Route
+     * @param serviceKey 查询参数
+     * @return Route
+     */
     @Override
     public List<Route> listByServiceKey(final String serviceKey) {
         return filterCategoryData(new ConvertURL2Entity<Route>() {
