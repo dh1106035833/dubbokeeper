@@ -84,14 +84,7 @@ public class RegistryServerSync implements InitializingBean, DisposableBean, Not
     }
 
     public void unregister(URL url){
-        Long id = URL_IDS_MAPPER.get(url.toFullString());
         URL_IDS_MAPPER.remove(url.toFullString());
-        String serviceKey = SyncUtils.generateServiceKey(url);
-        String category = url.getParameter(Constants.CATEGORY_KEY);
-        if (!StringUtils.isEmpty(serviceKey) && !StringUtils.isEmpty(category)) {
-            Map<Long, URL> services = registryCache.get(category).get(serviceKey);
-            services.remove(id);
-        }
         registryService.unregister(url);
     }
 
@@ -133,10 +126,10 @@ public class RegistryServerSync implements InitializingBean, DisposableBean, Not
             		}
                 }
             } else {
-                ConcurrentMap<String, Map<Long, URL>> services = registryCache.get(category);
+            	Map<String, Map<Long, URL>> services = categories.get(category);
                 if(services == null) {
-                    services = new ConcurrentHashMap<String, Map<Long, URL>>();
-                    registryCache.put(category,  services);
+                    services = new HashMap<String, Map<Long,URL>>();
+                    categories.put(category, services);
                 }
                 String service = SyncUtils.generateServiceKey(url);
                 Map<Long, URL> ids = services.get(service);
@@ -154,16 +147,15 @@ public class RegistryServerSync implements InitializingBean, DisposableBean, Not
                 }
             }
         }
-
-//        for(Map.Entry<String, Map<String, Map<Long, URL>>> categoryEntry : categories.entrySet()) {
-//            String category = categoryEntry.getKey();
-//            ConcurrentMap<String, Map<Long, URL>> services = registryCache.get(category);
-//            if(services == null) {
-//                services = new ConcurrentHashMap<String, Map<Long,URL>>();
-//                registryCache.put(category, services);
-//            }
-//            services.putAll(categoryEntry.getValue());
-//        }
+        for(Map.Entry<String, Map<String, Map<Long, URL>>> categoryEntry : categories.entrySet()) {
+            String category = categoryEntry.getKey();
+            ConcurrentMap<String, Map<Long, URL>> services = registryCache.get(category);
+            if(services == null) {
+                services = new ConcurrentHashMap<String, Map<Long,URL>>();
+                registryCache.put(category, services);
+            }
+            services.putAll(categoryEntry.getValue());
+        }
         
     }
     public void setRegistryService(RegistryService registryService) {
